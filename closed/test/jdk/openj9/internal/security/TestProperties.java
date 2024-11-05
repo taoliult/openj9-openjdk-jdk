@@ -48,19 +48,19 @@ public class TestProperties {
                 // 1 - Test profile - base profile misspell properties
                 Arguments.of("Test-Profile.Base",
                         System.getProperty("test.src") + "/property-java.security",
-                        "The property names: RestrictedSecurity.Test-Profile.Base.tls.disabledAlgorithmsWrongTypo " +
-                                "in profile RestrictedSecurity.Test-Profile.Base \\(or a base profile\\) are not recognized"),
+                        "The property names: RestrictedSecurity.Test-Profile.Base.tls.disabledAlgorithmsWrongTypo "
+                            + "in profile RestrictedSecurity.Test-Profile.Base \\(or a base profile\\) are not recognized"),
                 // 2 - Test profile - extenstion profile misspell properties
                 Arguments.of("Test-Profile.Extended_1",
                         System.getProperty("test.src") + "/property-java.security",
-                        "The property names: RestrictedSecurity.Test-Profile.Extended_1.desc.nameWrongTypo, " +
-                                "RestrictedSecurity.Test-Profile.Extended_1.jce.providerWrongTypo in profile " +
-                                "RestrictedSecurity.Test-Profile.Extended_1 \\(or a base profile\\) are not recognized"),
+                        "The property names: RestrictedSecurity.Test-Profile.Extended_1.desc.nameWrongTypo, "
+                            + "RestrictedSecurity.Test-Profile.Extended_1.jce.providerWrongTypo in profile "
+                            + "RestrictedSecurity.Test-Profile.Extended_1 \\(or a base profile\\) are not recognized"),
                 // 3 - Test profile - extension profile from another extension profile misspell properties
                 Arguments.of("Test-Profile.Extended_2",
                         System.getProperty("test.src") + "/property-java.security",
-                        "The property names: RestrictedSecurity.Test-Profile.Extended_2.jce.providerWrongTypo " +
-                                "in profile RestrictedSecurity.Test-Profile.Extended_2 \\(or a base profile\\) are not recognized"),
+                        "The property names: RestrictedSecurity.Test-Profile.Extended_2.jce.providerWrongTypo "
+                            + "in profile RestrictedSecurity.Test-Profile.Extended_2 \\(or a base profile\\) are not recognized"),
                 // 4 - Test profile - profile not exist
                 Arguments.of("Test-Profile-NotExist.Base",
                         System.getProperty("test.src") + "/property-java.security",
@@ -76,13 +76,13 @@ public class TestProperties {
                 // 7 - Test profile - base profile not exist
                 Arguments.of("Test-Profile.Extended_3",
                         System.getProperty("test.src") + "/property-java.security",
-                        "RestrictedSecurity.Test-Profile.BaseNotExist that is supposed to extend \\'RestrictedSecurity.Test-Profile.Extended_3\\' " +
-                                "is not present in the java.security file or any appended files"),
+                        "RestrictedSecurity.Test-Profile.BaseNotExist that is supposed to extend \\'RestrictedSecurity.Test-Profile.Extended_3\\' "
+                            + "is not present in the java.security file or any appended files"),
                 // 8 - Test profile - base profile not full profile name
                 Arguments.of("Test-Profile.Extended_4",
                         System.getProperty("test.src") + "/property-java.security",
-                        "RestrictedSecurity.BaseNotFullProfileName that is supposed to extend \\'RestrictedSecurity.Test-Profile.Extended_4\\' " +
-                                "is not a full profile name"),
+                        "RestrictedSecurity.BaseNotFullProfileName that is supposed to extend \\'RestrictedSecurity.Test-Profile.Extended_4\\' "
+                            + "is not a full profile name"),
                 // 9 - Test profile - base profile without hash value
                 Arguments.of("Test-Profile-BaseWithoutHash",
                         System.getProperty("test.src") + "/property-java.security",
@@ -142,8 +142,8 @@ public class TestProperties {
                 // 23 - Test constraint - constraint changed 1
                 Arguments.of("Test-Profile-ConstraintChanged_1.Extension",
                         System.getProperty("test.src") + "/property-java.security",
-                        "Cannot append or remove constraints since the provider (.*?) " +
-                                "wasn't in this position in the profile extended"),
+                        "Cannot append or remove constraints since the provider (.*?) "
+                            + "wasn't in this position in the profile extended"),
                 // 24 - Test constraint - constraint changed 2
                 Arguments.of("Test-Profile-ConstraintChanged_2.Extension",
                         System.getProperty("test.src") + "/property-java.security",
@@ -162,20 +162,19 @@ public class TestProperties {
                 "-Dsemeru.fips=true",
                 "-Dsemeru.customprofile=" + customprofile,
                 "-Djava.security.properties=" + securityPropertyFile,
-                //"-Djava.security.debug=semerufips",
                 "TestProperties"
         );
         outputAnalyzer.reportDiagnosticSummary();
         outputAnalyzer.shouldHaveExitValue(1).shouldMatch(expected);
     }
 
-    public static void main(String[] args) throws Exception {
-        // Something to trigger "properties" debug output
+    public static void main(String[] args) {
+        // Something to trigger "properties" debug output.
         try {
             Provider p[] = Security.getProviders();
-            for (int i = 0; i < p.length; i++) {
-                System.out.println("Provider Name: " + p[i].getName());
-                System.out.println("Provider Version: " + p[i].getVersion());
+            for (Provider provider : Security.getProviders()) {
+                System.out.println("Provider Name: " + provider.getName());
+                System.out.println("Provider Version: " + provider.getVersionStr());
             }
         } catch (Exception e) {
             System.out.println(e);

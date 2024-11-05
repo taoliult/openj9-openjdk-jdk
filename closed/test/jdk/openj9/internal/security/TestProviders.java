@@ -52,15 +52,15 @@ public class TestProviders {
                 // Test default profile provider list
                 Arguments.of("TestBase",
                         System.getProperty("test.src") + "/provider-java.security",
-                        "(?s)(?=.*Sun)(?=.*SunRsaSign)(?=.*SunEC)(?=.*SunJSSE)" +
-                                "(?=.*SunJCE)(?=.*SunJGSS)(?=.*SunSASL)" +
-                                "(?=.*XMLDSig)(?=.*SunPCSC)(?=.*JdkLDAP)(?=.*JdkSASL)"),
+                        "(?s)(?=.*Sun)(?=.*SunRsaSign)(?=.*SunEC)(?=.*SunJSSE)"
+                            + "(?=.*SunJCE)(?=.*SunJGSS)(?=.*SunSASL)"
+                            + "(?=.*XMLDSig)(?=.*SunPCSC)(?=.*JdkLDAP)(?=.*JdkSASL)"),
                 // Test extended profile provider list
                 Arguments.of("TestBase.Version-Extended",
                         System.getProperty("test.src") + "/provider-java.security",
-                        "(?s)(?=.*Sun)(?=.*SunRsaSign)(?=.*SunEC)(?=.*SunJSSE)" +
-                                "(?=.*SunJCE)(?=.*SunJGSS)(?=.*SunSASL)" +
-                                "(?=.*XMLDSig)(?=.*SunPCSC)(?=.*JdkLDAP)(?=.*JdkSASL)"),
+                        "(?s)(?=.*Sun)(?=.*SunRsaSign)(?=.*SunEC)(?=.*SunJSSE)"
+                            + "(?=.*SunJCE)(?=.*SunJGSS)(?=.*SunSASL)"
+                            + "(?=.*XMLDSig)(?=.*SunPCSC)(?=.*JdkLDAP)(?=.*JdkSASL)"),
                 // Test update provider list with value
                 Arguments.of("Test-Profile.Updated_1",
                         System.getProperty("test.src") + "/provider-java.security",
@@ -77,18 +77,18 @@ public class TestProviders {
                 // Test base profile - provider order numbers are not consecutive
                 Arguments.of("Test-Profile.Base",
                         System.getProperty("test.src") + "/provider-java.security",
-                        "The order numbers of providers in profile RestrictedSecurity.Test-Profile.Base " +
-                                "\\(or a base profile\\) are not consecutive"),
+                        "The order numbers of providers in profile RestrictedSecurity.Test-Profile.Base "
+                            + "\\(or a base profile\\) are not consecutive"),
                 // Test extended profile, provider order numbers are not consecutive
                 Arguments.of("Test-Profile.Extended_1",
                         System.getProperty("test.src") + "/provider-java.security",
-                        "The order numbers of providers in profile RestrictedSecurity.Test-Profile.Extended_1 " +
-                                "\\(or a base profile\\) are not consecutive."),
+                        "The order numbers of providers in profile RestrictedSecurity.Test-Profile.Extended_1 "
+                            + "\\(or a base profile\\) are not consecutive."),
                 // Test extended profile from another extended profile, provider order numbers are not consecutive
                 Arguments.of("Test-Profile.Extended_2",
                         System.getProperty("test.src") + "/provider-java.security",
-                        "The order numbers of providers in profile RestrictedSecurity.Test-Profile.Extended_2 " +
-                                "\\(or a base profile\\) are not consecutive."),
+                        "The order numbers of providers in profile RestrictedSecurity.Test-Profile.Extended_2 "
+                            + "\\(or a base profile\\) are not consecutive."),
                 // Test update provider list with empty, the empty is the last one in base profile
                 Arguments.of("Test-Profile.Updated_3",
                         System.getProperty("test.src") + "/provider-java.security",
@@ -127,7 +127,6 @@ public class TestProviders {
                 "-Dsemeru.fips=true",
                 "-Dsemeru.customprofile=" + customprofile,
                 "-Djava.security.properties=" + securityPropertyFile,
-                //"-Djava.security.debug=semerufips",
                 "TestProviders"
         );
         outputAnalyzer.reportDiagnosticSummary();
@@ -141,19 +140,18 @@ public class TestProviders {
                 "-Dsemeru.fips=true",
                 "-Dsemeru.customprofile=" + customprofile,
                 "-Djava.security.properties=" + securityPropertyFile,
-                //"-Djava.security.debug=semerufips",
                 "TestProviders"
         );
         outputAnalyzer.reportDiagnosticSummary();
         outputAnalyzer.shouldHaveExitValue(1).shouldMatch(expected);
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         try {
             Provider p[] = Security.getProviders();
-            for (int i = 0; i < p.length; i++) {
-                System.out.println("Provider Name: " + p[i].getName());
-                System.out.println("Provider Version: " + p[i].getVersion());
+            for (Provider provider : Security.getProviders()) {
+                System.out.println("Provider Name: " + provider.getName());
+                System.out.println("Provider Version: " + provider.getVersionStr());
             }
         } catch (Exception e) {
             System.out.println(e);
