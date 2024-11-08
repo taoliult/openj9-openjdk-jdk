@@ -21,7 +21,8 @@
  *
  * ===========================================================================
  */
- /*
+
+/*
  * @test
  * @summary Test Restricted Security Mode Properties
  * @library /test/lib
@@ -72,7 +73,7 @@ public class TestProperties {
                 Arguments.of("Test-Profile-NoDefault",
                         System.getProperty("test.src") + "/property-java.security",
                         "No default RestrictedSecurity profile was found for Test-Profile-NoDefault"),
-                // 7 - Test profile - base profile not exist.
+                // 7 - Test profile - base profile does not exist.
                 Arguments.of("Test-Profile.Extended_3",
                         System.getProperty("test.src") + "/property-java.security",
                         "RestrictedSecurity.Test-Profile.BaseNotExist that is supposed to extend \\'RestrictedSecurity.Test-Profile.Extended_3\\' "

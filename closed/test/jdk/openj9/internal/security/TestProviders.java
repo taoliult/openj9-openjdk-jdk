@@ -21,7 +21,8 @@
  *
  * ===========================================================================
  */
- /*
+
+/*
  * @test
  * @summary Test Restricted Security Mode Provider List
  * @library /test/lib
