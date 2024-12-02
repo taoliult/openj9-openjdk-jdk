@@ -49,6 +49,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import compiler.lib.ir_framework.driver.irmatching.irrule.constraint.Constraint;
 import sun.security.util.Debug;
 
 /**
@@ -345,9 +346,10 @@ public final class RestrictedSecurity {
             }
             String defaultMatch = null;
             boolean profileExists = false;
+            String profilePrefix = potentialProfileID + '.';
             for (Object keyObject : props.keySet()) {
                 if (keyObject instanceof String key) {
-                    if (key.startsWith(potentialProfileID + '.')) {
+                    if (key.startsWith(profilePrefix)) {
                         profileExists = true;
                         if (key.endsWith(".desc.default")) {
                             // Check if property is set to true.
