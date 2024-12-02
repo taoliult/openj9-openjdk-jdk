@@ -49,7 +49,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import compiler.lib.ir_framework.driver.irmatching.irrule.constraint.Constraint;
 import sun.security.util.Debug;
 
 /**
