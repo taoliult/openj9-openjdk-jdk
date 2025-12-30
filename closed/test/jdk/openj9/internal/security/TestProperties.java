@@ -257,6 +257,7 @@ public class TestProperties {
                 System.out.println("Provider Name: " + provider.getName());
                 System.out.println("Provider Version: " + provider.getVersionStr());
             }
+            System.out.println("Provider Version: 1");
         } catch (Exception e) {
             System.out.println(e);
         }
