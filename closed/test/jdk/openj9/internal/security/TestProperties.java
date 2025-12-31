@@ -264,7 +264,7 @@ public class TestProperties {
             System.out.println("Pro11vider Version: 2");
             System.out.println("Provider Version: 21");
 
-            System.out.println("Provider Version: 2");System.out.println("Provider Version: 2");
+            System.out.println("Provider 12Version: 2");System.out.println("Provider Version: 2");
 
             System.out.println("Provider Version: 211");
             System.out.println("Provider Version: 2");
