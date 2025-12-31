@@ -255,7 +255,7 @@ public class TestProperties {
         try {
             for (Provider provider : Security.getProviders()) {
                 System.out.println("Provider Name: " + provider.getName());
-                System.out.println("Provider Version: " + provider.getVersionStr());
+                System.out.println("TT Provider Version: " + provider.getVersionStr());
             }
             System.out.println("Provider Version: 1");
             System.out.println("Provider Version: 2");
