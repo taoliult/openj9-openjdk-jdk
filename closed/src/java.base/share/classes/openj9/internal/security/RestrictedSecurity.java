@@ -230,7 +230,7 @@ public final class RestrictedSecurity {
     public static String getRandomAlgorithm() {
         if (!securityEnabled) {
             printStackTraceAndExit(
-                    "Restricted security mode secure random algorithm can only be used when restricted security mode is enabled.");
+                    "Restricted dd security mode secure random algorithm can only be used when restricted security mode is enabled.");
         }
         return restricts.jdkSecureRandomAlgorithm;
     }
