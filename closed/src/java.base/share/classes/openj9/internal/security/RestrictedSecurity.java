@@ -23,6 +23,8 @@
  */
 package openj9.internal.security;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -64,6 +66,7 @@ public final class RestrictedSecurity {
     private static boolean isFIPSEnabled;
 
     private static final boolean allowSetProperties;
+    private static final boolean allowNSS1402OnUnsupportedPlatform;
     private static final boolean suppressSunsetWarning;
     private static final boolean ignoreSunsetExpiration;
 
@@ -107,6 +110,7 @@ public final class RestrictedSecurity {
 
         userEnabledFIPS = Boolean.getBoolean("semeru.fips");
         allowSetProperties = Boolean.getBoolean("semeru.fips.allowsetproperties");
+        allowNSS1402OnUnsupportedPlatform = getBooleanPropertyTreatEmptyAsTrue("semeru.fips.allownss1402onunsupportedplatform");
         suppressSunsetWarning = getBooleanPropertyTreatEmptyAsTrue("semeru.restrictedsecurity.suppresssunsetwarning");
         ignoreSunsetExpiration = getBooleanPropertyTreatEmptyAsTrue("semeru.restrictedsecurity.ignoresunsetexpiration");
 
@@ -412,6 +416,15 @@ public final class RestrictedSecurity {
         if (profileID.contains("NSS") && !isNSSSupported) {
             printStackTraceAndExit("NSS RestrictedSecurity profiles are not supported"
                     + " on this platform.");
+        }
+
+        if (profileID.contains("NSS.140-2") && !isRHEL9OrBelow()) {
+            if (allowNSS1402OnUnsupportedPlatform) {
+                System.err.println("WARNING: NSS FIPS 140-2 profiles are only supported on RHEL 9 and earlier versions."
+                        + " The -Dsemeru.fips.allownss1402onunsupportedplatform property has been specified to override this check.");
+            } else {
+                printStackTraceAndExit("FIPS 140-2 profiles are only supported on RHEL 9 and earlier versions.");
+            }
         }
 
         if (debug != null) {
@@ -767,6 +780,56 @@ public final class RestrictedSecurity {
                 return true;
             }
         }
+        return false;
+    }
+
+    private static boolean isRHEL9OrBelow() {
+        String osName = System.getProperty("os.name");
+        if ((osName == null) || !osName.contains("Linux")) {
+            return false;
+        }
+
+        File osRelease = new File("/etc/os-release");
+        if (osRelease.canRead()) {
+            try (FileInputStream fis = new FileInputStream(osRelease)) {
+                Properties props = new Properties();
+                props.load(fis);
+                String id = props.getProperty("ID", "").replace("\"", "");
+                String idLike = props.getProperty("ID_LIKE", "").replace("\"", "");
+                if ("rhel".equalsIgnoreCase(id) || idLike.contains("rhel") || idLike.contains("fedora")
+                        || "centos".equalsIgnoreCase(id) || "rocky".equalsIgnoreCase(id) || "almalinux".equalsIgnoreCase(id)) {
+                    String versionId = props.getProperty("VERSION_ID", "").replace("\"", "");
+                    int dotIndex = versionId.indexOf('.');
+                    String majorStr = (dotIndex != -1) ? versionId.substring(0, dotIndex) : versionId;
+                    if (!majorStr.isEmpty()) {
+                        int major = Integer.parseInt(majorStr);
+                        return major <= 9;
+                    }
+                }
+            } catch (Exception e) {
+                if (debug != null) {
+                    debug.println("Failed to read /etc/os-release: " + e.getMessage());
+                }
+            }
+        }
+
+        File redhatRelease = new File("/etc/redhat-release");
+        if (redhatRelease.canRead()) {
+            try (FileInputStream fis = new FileInputStream(redhatRelease)) {
+                byte[] bytes = fis.readAllBytes();
+                String content = new String(bytes, StandardCharsets.UTF_8);
+                Matcher matcher = Pattern.compile("release\\s+(\\d+)").matcher(content);
+                if (matcher.find()) {
+                    int major = Integer.parseInt(matcher.group(1));
+                    return major <= 9;
+                }
+            } catch (Exception e) {
+                if (debug != null) {
+                    debug.println("Failed to read /etc/redhat-release: " + e.getMessage());
+                }
+            }
+        }
+
         return false;
     }
 
