@@ -23,7 +23,10 @@
  */
 package openj9.internal.security;
 
+import java.io.BufferedReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
@@ -64,6 +67,7 @@ public final class RestrictedSecurity {
     private static boolean isFIPSEnabled;
 
     private static final boolean allowSetProperties;
+    private static final boolean allowNSS1402OnUnsupportedRedHat;
     private static final boolean suppressSunsetWarning;
     private static final boolean ignoreSunsetExpiration;
 
@@ -107,6 +111,7 @@ public final class RestrictedSecurity {
 
         userEnabledFIPS = Boolean.getBoolean("semeru.fips");
         allowSetProperties = Boolean.getBoolean("semeru.fips.allowsetproperties");
+        allowNSS1402OnUnsupportedRedHat = getBooleanPropertyTreatEmptyAsTrue("semeru.fips.allownss1402onunsupportedredhat");
         suppressSunsetWarning = getBooleanPropertyTreatEmptyAsTrue("semeru.restrictedsecurity.suppresssunsetwarning");
         ignoreSunsetExpiration = getBooleanPropertyTreatEmptyAsTrue("semeru.restrictedsecurity.ignoresunsetexpiration");
 
@@ -412,6 +417,15 @@ public final class RestrictedSecurity {
         if (profileID.contains("NSS") && !isNSSSupported) {
             printStackTraceAndExit("NSS RestrictedSecurity profiles are not supported"
                     + " on this platform.");
+        }
+
+        if (profileID.contains("NSS.140-2") && !isRHEL8()) {
+            if (allowNSS1402OnUnsupportedRedHat) {
+                System.err.println("WARNING: NSS FIPS 140-2 profiles are only supported on RHEL 8."
+                        + " The -Dsemeru.fips.allownss1402onunsupportedredhat property has been specified to override this check.");
+            } else {
+                printStackTraceAndExit("FIPS 140-2 profiles are only supported on RHEL 8.");
+            }
         }
 
         if (debug != null) {
@@ -768,6 +782,27 @@ public final class RestrictedSecurity {
             }
         }
         return false;
+    }
+
+    private static boolean isRHEL8() {
+        String osName = System.getProperty("os.name");
+        if ((osName == null) || !osName.contains("Linux")) {
+            return false;
+        }
+
+        try (BufferedReader reader = Files.newBufferedReader(Path.of("/etc/os-release"))) {
+            Properties props = new Properties();
+            props.load(reader);
+            String id = props.getProperty("ID", "").replace("\"", "");
+            String versionId = props.getProperty("VERSION_ID", "").replace("\"", "");
+            return "rhel".equalsIgnoreCase(id)
+                    && (versionId.equals("8") || versionId.startsWith("8."));
+        } catch (Exception e) {
+            if (debug != null) {
+                debug.println("Failed to read /etc/os-release: " + e.getMessage());
+            }
+            return false;
+        }
     }
 
     /**
